@@ -1,0 +1,31 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Email with Table</title>
+    <style>
+      th { background-color: darkgreen; color: white; }
+    </style>
+  </head>
+  <body>
+    <h2>Hi Wilson</h2>
+    <h3>Responding to the required information</h3>
+
+    <table cellpadding='5'>
+      <tr>
+        <th>start</th>
+        <th>end</th>
+        <th>Ammount</th>
+        <th>Comment</th>
+      </tr>
+      {{#each message}}
+        <tr>
+          <td>{{splitdate this.start}}</td>
+          <td>{{splitdate this.end}}</td>
+          <td>{{this.ammount}}</td>
+          <td>{{this.comment}}</td>
+        </tr>
+      {{/each}}
+    </table>
+  </body>
+</html>
