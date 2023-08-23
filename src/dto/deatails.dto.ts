@@ -8,6 +8,12 @@ export class DetailsDTO {
   @IsString()
   subject: string;
 
+  @IsString()
+  vendorName: string;
+
+  @IsString()
+  selectedDate: string;
+
   @ValidateNested()
   @Type(() => Form)
   message: Form[];

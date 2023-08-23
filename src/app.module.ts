@@ -5,6 +5,9 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import * as handlebars from 'handlebars';
 import { join } from 'path';
+import { DbModule } from './db/db.module';
+import { DetailsProviders } from './repo/details.repo';
+import { MaliedProviders } from './repo/mailed.repo';
 
 handlebars.registerHelper('splitdate', (date: string) => {
   console.log(typeof date, date);
@@ -24,15 +27,16 @@ handlebars.registerHelper('splitdate', (date: string) => {
         },
         template: {
           dir: join(__dirname, '/templates'),
-          adapter: new HandlebarsAdapter(), // Use Handlebars for templates
+          adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
           },
         },
       }),
     }),
+    DbModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [...DetailsProviders, ...MaliedProviders, AppService],
 })
 export class AppModule {}
