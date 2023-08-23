@@ -1,4 +1,4 @@
-// import { MailerService } from '@nestjs-modules/mailer';
+import { MailerService } from '@nestjs-modules/mailer';
 import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Mailed } from './db/Entity/mailed';
@@ -7,7 +7,7 @@ import { Details } from './db/Entity/details';
 @Injectable()
 export class AppService {
   constructor(
-    // private readonly mailService: MailerService,
+    private readonly mailService: MailerService,
     @Inject('MAILED_REPOSITORY')
     private mailRepo: Repository<Mailed>,
     @Inject('DETAILS_REPOSITORY')
@@ -15,7 +15,7 @@ export class AppService {
   ) {}
 
   async sendMail(details) {
-    /*    const tmp = await this.mailService.sendMail({
+    const tmp = await this.mailService.sendMail({
       to: details.email,
       from: 'kunal77avghade@gmail.com',
       subject: details.subject,
@@ -26,7 +26,8 @@ export class AppService {
         selectedDate: details.selectedDate,
       },
     });
-    */
+    console.log(tmp);
+
     const mail = {
       vendor: details.vendorName,
       mailed_on: new Date(),
