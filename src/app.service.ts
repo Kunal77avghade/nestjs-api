@@ -94,4 +94,9 @@ export class AppService {
     for (const detail of tmp.details) await this.detailsRepo.remove(detail);
     return await this.mailRepo.remove(tmp);
   }
+
+  async deleteall() {
+    await this.detailsRepo.delete({});
+    await this.mailRepo.delete({});
+  }
 }

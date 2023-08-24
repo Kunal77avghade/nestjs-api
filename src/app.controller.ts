@@ -39,4 +39,10 @@ export class AppController {
     this.appService.sendMailVendor(mail);
     return 'ok';
   }
+
+  @Delete()
+  async deleteAll() {
+    await this.appService.deleteall();
+    return 'ok';
+  }
 }
