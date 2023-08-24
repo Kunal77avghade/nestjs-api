@@ -15,6 +15,6 @@ export class Mailed {
   @Column()
   dateFor: string;
 
-  @OneToMany(() => Details, (details) => details.mail, { cascade: true })
+  @OneToMany(() => Details, (details) => details.mail)
   details: Details[];
 }

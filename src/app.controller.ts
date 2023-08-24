@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { AppService } from './app.service';
-import { DetailsDTO } from './dto/deatails.dto';
+import { DetailsDTO, Mail } from './dto/deatails.dto';
 
 @Controller()
 export class AppController {
@@ -19,6 +19,11 @@ export class AppController {
     return this.appService.getAll();
   }
 
+  @Get('/download')
+  getDetailsDownload(): any {
+    return this.appService.getAllWithVendor();
+  }
+
   @Delete('/:id')
   remove(@Param('id') id: string) {
     return this.appService.delete(id);
@@ -27,5 +32,11 @@ export class AppController {
   @Get('/:id')
   getOne(@Param('id') id: string) {
     return this.appService.getOne(id);
+  }
+
+  @Post('/sendmail')
+  sendMail(@Body() mail: Mail): string {
+    this.appService.sendMailVendor(mail);
+    return 'ok';
   }
 }

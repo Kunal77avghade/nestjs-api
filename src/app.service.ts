@@ -3,6 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Mailed } from './db/Entity/mailed';
 import { Details } from './db/Entity/details';
+import { Mail } from './dto/deatails.dto';
 
 @Injectable()
 export class AppService {
@@ -16,9 +17,10 @@ export class AppService {
 
   async sendMail(details) {
     const tmp = await this.mailService.sendMail({
-      to: details.email,
+      to: 'kunal77avghade@gmail.com',
+      cc: details.email,
       from: 'kunal77avghade@gmail.com',
-      subject: details.subject,
+      subject: `Vendor Accruals Request - ${details.vendorName}`,
       template: 'mail',
       context: {
         message: details.message,
@@ -36,6 +38,20 @@ export class AppService {
     this.save(mail, details.message);
   }
 
+  async sendMailVendor(mail: Mail) {
+    const tmp = await this.mailService.sendMail({
+      to: mail.email,
+      from: 'kunal77avghade@gmail.com',
+      subject: 'Remainder',
+      template: 'vendor',
+      context: {
+        vendorName: mail.vendorName,
+        selectedDate: mail.selectedDate,
+      },
+    });
+    console.log(tmp);
+  }
+
   async save(mail: Partial<Mailed>, details: Partial<Details>[]) {
     const details_entity = details.map((d) => this.detailsRepo.create(d));
     const saved_details = await this.detailsRepo.save(details_entity);
@@ -48,7 +64,11 @@ export class AppService {
   }
 
   getAll() {
-    return this.mailRepo.find();
+    return this.mailRepo.find({
+      order: {
+        mailed_on: 'DESC',
+      },
+    });
   }
 
   async getOne(id: string) {
@@ -60,7 +80,18 @@ export class AppService {
     });
   }
 
+  async getAllWithVendor() {
+    const res = await this.detailsRepo
+      .createQueryBuilder('details')
+      .leftJoinAndSelect('details.mail', 'mailed')
+      .select(['details', 'mailed.vendor'])
+      .getMany();
+    return res.map((item) => ({ ...item, vendor: item.mail.vendor }));
+  }
+
   async delete(id: string) {
-    return await this.mailRepo.remove(await this.getOne(id));
+    const tmp = await this.getOne(id);
+    for (const detail of tmp.details) await this.detailsRepo.remove(detail);
+    return await this.mailRepo.remove(tmp);
   }
 }

@@ -15,7 +15,6 @@ export const DbConnection = [
         database: 'invoices',
         synchronize: true,
         entities: [Mailed, Details],
-        logging: true,
       });
       return await dataSource.initialize();
     },

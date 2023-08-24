@@ -6,9 +6,6 @@ export class DetailsDTO {
   email: string;
 
   @IsString()
-  subject: string;
-
-  @IsString()
   vendorName: string;
 
   @IsString()
@@ -28,4 +25,15 @@ export class Form {
   comment: string;
   @IsNumber()
   ammount: number;
+}
+
+export class Mail {
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  vendorName: string;
+
+  @IsString()
+  selectedDate: string;
 }

@@ -3,38 +3,14 @@
     <meta charset='UTF-8' />
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <title>Email with Table</title>
-    <style>
-      th { background-color: darkgreen; color: white; }
-    </style>
   </head>
-  <body>
-    <p>Hi Wilson,</p>
-    <p>Responding to the required information</p>
 
-    <table cellpadding='5'>
-      <tr>
-        <th>start</th>
-        <th>end</th>
-        <th>Ammount</th>
-        <th>Comment</th>
-      </tr>
-      {{#each message}}
-        <tr>
-          <td>{{splitdate this.start}}</td>
-          <td>{{splitdate this.end}}</td>
-          <td>{{this.ammount}}</td>
-          <td>{{this.comment}}</td>
-        </tr>
-      {{/each}}
-    </table>
-    <p>=====================================
-      <br />
-       Dear
+  <body>
+    Dear
     {{vendorName}},<br />
     A friendly reminder to please provide the following for Checkr Inc. and
     Inflection.com for
     {{selectedDate}}:
-    <br />
 
     <ul>
       <li>
@@ -45,6 +21,9 @@
         of your response and the last day of the month. Thank you and have a
         great day!
       </li></ul>
+    <br />
+
+    <a href='http://localhost:3000'>Click here</a>
 
     <br />
     Wilson Machado
