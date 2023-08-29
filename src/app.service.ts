@@ -3,56 +3,66 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Mailed } from './db/Entity/mailed';
 import { Details } from './db/Entity/details';
-import { Mail } from './dto/deatails.dto';
+import { DetailsDTO, Mail } from './dto/deatails.dto';
+import { constants } from './config/constants';
 
 @Injectable()
 export class AppService {
   constructor(
     private readonly mailService: MailerService,
-    @Inject('MAILED_REPOSITORY')
+    @Inject(constants.MAILED_REPOSITORY)
     private mailRepo: Repository<Mailed>,
-    @Inject('DETAILS_REPOSITORY')
+    @Inject(constants.DETAILS_REPOSITORY)
     private detailsRepo: Repository<Details>,
   ) {}
 
-  async sendMail(details) {
-    const tmp = await this.mailService.sendMail({
-      to: 'kunal77avghade@gmail.com',
-      cc: details.email,
-      from: 'kunal77avghade@gmail.com',
-      subject: `Vendor Accruals Request - ${details.vendorName}`,
-      template: 'mail',
-      context: {
-        message: details.message,
-        vendorName: details.vendorName,
-        selectedDate: details.selectedDate,
-      },
-    });
-    console.log(tmp);
-
-    const mail = {
-      vendor: details.vendorName,
-      mailed_on: new Date(),
-      dateFor: details.selectedDate,
-    };
-    this.save(mail, details.message);
+  async sendMail(details: DetailsDTO) {
+    try {
+      await this.mailService.sendMail({
+        to: process.env.ADMIN_EMAIL,
+        cc: details.email,
+        from: process.env.ADMIN_EMAIL,
+        subject: `${constants.SUBJECT_PREFIX} - ${details.vendorName}`,
+        template: 'mail',
+        context: {
+          message: details.message,
+          vendorName: details.vendorName,
+          selectedDate: details.selectedDate,
+        },
+      });
+    } catch (error) {
+      // console.error('service error', error);
+      throw new Error(error);
+    }
   }
 
   async sendMailVendor(mail: Mail) {
-    const tmp = await this.mailService.sendMail({
-      to: mail.email,
-      from: 'kunal77avghade@gmail.com',
-      subject: 'Remainder',
-      template: 'vendor',
-      context: {
-        vendorName: mail.vendorName,
-        selectedDate: mail.selectedDate,
-      },
-    });
-    console.log(tmp);
+    try {
+      await this.mailService.sendMail({
+        to: mail.email,
+        from: process.env.ADMIN_EMAIL,
+        subject: constants.SUBJECT_VENDOR,
+        template: 'vendor',
+        context: {
+          vendorName: mail.vendorName,
+          selectedDate: mail.selectedDate,
+          email: mail.email,
+        },
+      });
+    } catch (error) {
+      // console.error('service error', error);
+      throw new Error(error);
+    }
   }
 
-  async save(mail: Partial<Mailed>, details: Partial<Details>[]) {
+  async saveRecord(data: DetailsDTO) {
+    const mail = {
+      vendor: data.vendorName,
+      mailed_on: new Date(),
+      dateFor: data.selectedDate,
+    };
+    const details = data.message;
+
     const details_entity = details.map((d) => this.detailsRepo.create(d));
     const saved_details = await this.detailsRepo.save(details_entity);
 

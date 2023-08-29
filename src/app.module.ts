@@ -8,21 +8,23 @@ import { join } from 'path';
 import { DbModule } from './db/db.module';
 import { DetailsProviders } from './repo/details.repo';
 import { MaliedProviders } from './repo/mailed.repo';
+import { ConfigModule } from '@nestjs/config';
 
-handlebars.registerHelper('splitdate', (date: string) => {
-  console.log(typeof date, date);
-  return date.split('T')[0];
-});
+handlebars.registerHelper(
+  'splitdate',
+  (date: Date) => date.toJSON().split('T')[0],
+);
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {
-          host: 'smtp.gmail.com',
+          host: process.env.EMAIL_HOST,
           auth: {
-            user: 'kunal77avghade@gmail.com',
-            pass: 'devmniovyayewxnl',
+            user: process.env.ADMIN_EMAIL,
+            pass: process.env.ADMIN_EMAIL_PASS,
           },
         },
         template: {

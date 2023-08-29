@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsEmail, IsNumber, IsString, ValidateNested } from 'class-validator';
+import {
+  IsDate,
+  IsEmail,
+  IsNumber,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 export class DetailsDTO {
   @IsEmail()
@@ -17,10 +23,12 @@ export class DetailsDTO {
 }
 
 export class Form {
-  @IsString()
-  start: string;
-  @IsString()
-  end: string;
+  @Type(() => Date)
+  @IsDate()
+  start: Date;
+  @Type(() => Date)
+  @IsDate()
+  end: Date;
   @IsString()
   comment: string;
   @IsNumber()

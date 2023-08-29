@@ -1,43 +1,64 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  InternalServerErrorException,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { DetailsDTO, Mail } from './dto/deatails.dto';
+import { Serialize } from './intercepter/serialize.intercepter';
+import { DataWithVendor } from './dto/response.details.dto';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Post('/data')
-  getInvoiceDate(@Body() details: DetailsDTO): string {
-    const stat = this.appService.sendMail(details);
-    console.log(stat);
-    console.log(details);
-    return 'ok';
+  async getInvoiceDate(@Body() details: DetailsDTO) {
+    try {
+      await this.appService.sendMail(details);
+      await this.appService.saveRecord(details);
+      return 'ok';
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @Post('/sendmail')
+  sendMail(@Body() mail: Mail) {
+    try {
+      this.appService.sendMailVendor(mail);
+      return 'ok';
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   @Get('/')
-  getDetails(): any {
+  getDetails() {
     return this.appService.getAll();
   }
 
   @Get('/download')
-  getDetailsDownload(): any {
+  @Serialize(DataWithVendor)
+  getDetailsDownload() {
     return this.appService.getAllWithVendor();
+  }
+
+  @Get('/:id')
+  async getOne(@Param('id') id: string) {
+    const detail = await this.appService.getOne(id);
+    if (!detail) throw new NotFoundException('detail not found ');
+    return detail;
   }
 
   @Delete('/:id')
   remove(@Param('id') id: string) {
     return this.appService.delete(id);
-  }
-
-  @Get('/:id')
-  getOne(@Param('id') id: string) {
-    return this.appService.getOne(id);
-  }
-
-  @Post('/sendmail')
-  sendMail(@Body() mail: Mail): string {
-    this.appService.sendMailVendor(mail);
-    return 'ok';
   }
 
   @Delete()
